@@ -24,6 +24,9 @@ namespace LKU8.shoukuan
 
 
         DataTable dtXunjia;
+        DataTable dtKuCun;
+        DataTable dtXunjias;
+        DataTable dtLishiXunjia;
         string sColname;
         
 
@@ -33,6 +36,7 @@ namespace LKU8.shoukuan
 
             ExtensionMethods.DoubleBuffered(dataGridView1, true);
             ExtensionMethods.DoubleBuffered(dataGridView2, true);
+           
         }
 
     
@@ -40,9 +44,10 @@ namespace LKU8.shoukuan
         #region 单元格显示按钮，参照档案
         private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
         {
+            // sColname == "cdefine1"，  销售公司，20201120取消
             this.dataGridView1.Controls.Clear();//移除所有控件
             sColname = this.dataGridView1.Columns[e.ColumnIndex].Name.ToString();
-            if (sColname == "cinvcode" || sColname == "xmbm" || sColname == "ccusname" || sColname == "zdxjr" || sColname == "cdefine1")
+            if (sColname == "cinvcode" || sColname == "xmbm" || sColname == "ccusname" || sColname == "zdxjr" )
             //if (e.ColumnIndex.Equals(this.dataGridView1.Columns["dinvcode"].Index) || e.ColumnIndex.Equals(this.dataGridView1.Columns["Dopseq"].Index) || e.ColumnIndex.Equals(this.dataGridView1.Columns["Ddefine_23"].Index))
             {
                 System.Windows.Forms.Button btn = new System.Windows.Forms.Button();//创建Buttonbtn   
@@ -106,30 +111,42 @@ namespace LKU8.shoukuan
                             dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cinvstd"].Value = DbHelper.GetDbString(retRstGrid.Fields["cinvstd"].Value);
                             //dtXunjia.Rows[dataGridView1.CurrentCell.RowIndex]["cEnglishname"] = DbHelper.GetDbString(retRstGrid.Fields["cEnglishname"].Value);
 
+                            //取英文名，中文名。   取消自制优势产品20201120 
                             string sql = @"
-select a.cEnglishname,b.bSelf,b.bSup from inventory a 
-LEFT JOIN  zdy_lk_Inventory_Sup b ON a.cInvAddCode = b.cInvaddcode
- where dedate is null and  a.cinvaddcode  ='" + DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value) + "'";
+select cinvname, a.cEnglishname from zdy_lk_inventory a 
+ where cas  ='" + DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value) + "'";
                             DataTable dt = DbHelper.ExecuteTable(sql);
                             if (dt.Rows.Count > 0)
                             {
-
+                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cinvname"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvname"]);
                                 dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
 
-                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSelf"];
-                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSup"];
+                                //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSelf"];
+                                //dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSup"];
 
-                                sql = string.Format(@"
-SELECT SUM(a.iQuantity) sl  FROM dbo.CurrentStock  a,dbo.Inventory b WHERE a.cInvCode = b.cInvCode and b.cinvaddcode = '{0}'
-GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value));
-                                if (DbHelper.GetDbInt(DbHelper.ExecuteScalar(sql)) > 0)
-                                {
-                                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bkucun"].Value = "True";
+                                //                                sql = string.Format(@"
+                                //SELECT SUM(a.iQuantity) sl  FROM dbo.CurrentStock  a,dbo.Inventory b WHERE a.cInvCode = b.cInvCode and b.cinvaddcode = '{0}'
+                                //GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value));
+                                //                                if (DbHelper.GetDbInt(DbHelper.ExecuteScalar(sql)) > 0)
+                                //                                {
+                                //                                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bkucun"].Value = "True";
 
-                                }
-                                else
+                                //                                }
+                                //                                else
+                                //                                {
+                                //                                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bkucun"].Value = "False";
+
+                                //                                }
+                            }
+                            else
+                            {
+                                sql = @"
+select a.cEnglishname from inventory a 
+ where dedate is null and  a.cinvaddcode  ='" + DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value) + "'";
+                                dt = DbHelper.ExecuteTable(sql);
+                                if (dt.Rows.Count > 0)
                                 {
-                                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["bkucun"].Value = "False";
+                                    dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
 
                                 }
                             }
@@ -140,9 +157,6 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                 {
                     MessageBox.Show("参照失败，原因：" + ex.Message);
                 }
-
-
-             
             }
             else if (sColname == "ccusname")
             {
@@ -252,42 +266,42 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                     MessageBox.Show("参照失败，原因：" + ex.Message);
                 }
             }
-            else if (sColname == "cdefine1")
-            {
-                try
-                {
+            //else if (sColname == "cdefine1")
+            //{
+            //    try
+            //    {
 
-                    U8RefService.IServiceClass obj = new U8RefService.IServiceClass();
-                    obj.RefID = "userdefine_aa";
-                    obj.Mode = U8RefService.RefModes.modeRefing;
-                    obj.FilterSQL = " cid =01";
-                    obj.FillText = dataGridView1.CurrentCell.Value.ToString();
-                    obj.Web = false;
-                    obj.MetaXML = "<Ref><RefSet   bMultiSel='0'  /></Ref>";
-                    obj.RememberLastRst = false;
-                    ADODB.Recordset retRstGrid = null, retRstClass = null;
-                    string sErrMsg = "";
-                    obj.GetPortalHwnd((int)this.Handle);
+            //        U8RefService.IServiceClass obj = new U8RefService.IServiceClass();
+            //        obj.RefID = "userdefine_aa";
+            //        obj.Mode = U8RefService.RefModes.modeRefing;
+            //        obj.FilterSQL = " cid =01";
+            //        obj.FillText = dataGridView1.CurrentCell.Value.ToString();
+            //        obj.Web = false;
+            //        obj.MetaXML = "<Ref><RefSet   bMultiSel='0'  /></Ref>";
+            //        obj.RememberLastRst = false;
+            //        ADODB.Recordset retRstGrid = null, retRstClass = null;
+            //        string sErrMsg = "";
+            //        obj.GetPortalHwnd((int)this.Handle);
 
-                    Object objLogin = canshu.u8Login;
-                    if (obj.ShowRefSecond(ref objLogin, ref retRstClass, ref retRstGrid, ref sErrMsg) == false)
-                    {
-                        MessageBox.Show(sErrMsg);
-                    }
-                    else
-                    {
-                        if (retRstGrid != null)
-                        {
-                            dataGridView1.CurrentCell.Value = DbHelper.GetDbString(retRstGrid.Fields["cvalue"].Value);
+            //        Object objLogin = canshu.u8Login;
+            //        if (obj.ShowRefSecond(ref objLogin, ref retRstClass, ref retRstGrid, ref sErrMsg) == false)
+            //        {
+            //            MessageBox.Show(sErrMsg);
+            //        }
+            //        else
+            //        {
+            //            if (retRstGrid != null)
+            //            {
+            //                dataGridView1.CurrentCell.Value = DbHelper.GetDbString(retRstGrid.Fields["cvalue"].Value);
 
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("参照失败，原因：" + ex.Message);
-                }
-            }
+            //            }
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show("参照失败，原因：" + ex.Message);
+            //    }
+            //}
         }
 
         private void dataGridView1_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
@@ -311,7 +325,7 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                 //Dgvfuzhu.BindReadDataGridViewStyle(this.Name, dataGridView2); // 初始化布局
                 dataGridView2.AutoGenerateColumns = false;
                 dataGridView1.AutoGenerateColumns = false;
-
+                dataGridView3.AutoGenerateColumns = false;
                 txtywy.Text = canshu.userName;
                 string cQx ;
                     string sql = "select cSysUserName from UA_User where cSysUserName is not null and  cUser_Id='" + canshu.u8Login.cUserId + "'";
@@ -331,7 +345,6 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                     dataGridView2.Columns["gys"].Visible = true;
                     dataGridView2.Columns["cCost"].Visible = true;
                     dataGridView2.Columns["cattch"].Visible = true;
-
                     下载附件.Enabled = true;
 
                 }
@@ -340,7 +353,15 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                 dataGridView1.DataSource = dtXunjia;
 
                 comboBox1.Text = "未提交";
+
                 Dgvfuzhu.BindReadDataGridViewStyle(this.Name, dataGridView1); // 初始化布局
+                //获得亚太链接字符串
+                sql = "  SELECT cvalue FROM zdy_lk_para WHERE lx = 105";
+                canshu.conStr2 =DbHelper.GetDbString(DbHelper.ExecuteScalar(sql));
+                 sql = "  SELECT cvalue FROM zdy_lk_para WHERE lx = 106";
+                 canshu.bCxJiangXikc = DbHelper.GetDbString(DbHelper.ExecuteScalar(sql));
+                
+                //DevExpress.XtraGrid.Localization.GridLocalizer.Active = new bisoft.XLocallizerGrid();
             }
             catch (Exception ex)
             {
@@ -506,13 +527,13 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                        string id = DbHelper.GetDbString(dataGridView1.Rows[i].Cells["id"].Value);
                        string cInvcode = DbHelper.GetDbString(dataGridView1.Rows[i].Cells["cinvcode"].Value);
                        //判断是否重复询价
-                       string sqlpd = "select count(1) from zdy_lk_xunjia where ID<>'"+id+"' and cinvcode = '" + cInvcode + "' and datediff(day,ddate,getdate())<3";
+                       string sqlpd = "select count(1) from zdy_lk_xunjia where ID<>'"+id+"' and cinvcode = '" + cInvcode + "' and datediff(day,ddate,getdate())<7";
                        object objpd = DbHelper.ExecuteScalar(sqlpd);
                        if (Convert.ToInt32(objpd)>0)
                        {
 
                            
-                           DialogResult result= MessageBox.Show("第"+(i+1).ToString()+"行产品" + cInvcode + "最近两天已有询价，是否保存？","提示",MessageBoxButtons.OKCancel);
+                           DialogResult result= MessageBox.Show("第"+(i+1).ToString()+"行产品" + cInvcode + "最近7天已有询价，是否保存？","提示",MessageBoxButtons.OKCancel);
                            //DataTable dtmx 
                            if (result == DialogResult.Cancel)
                            //dataGridView2.DataSource = DbHelper.ExecuteTable("select ddate,gys,xunjia1,xunjia2,xunjia3,bz1,bz2,bz3 from zdy_lk_xunjias where id ='" + objpd.ToString() + "'");
@@ -527,8 +548,8 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                        if (string.IsNullOrEmpty(id))
                        {
 
-                           string sql = @" Insert Into zdy_lk_xunjia(ccusname,xmbm,cinvcode,cinvaddcode,cinvname,cinvstd,cqty1,cmemo1,czt,cmaker,ddate,dmaketime,bimportant,burgent,zdxjr,baojia1,cpersoncode,cdefine1,bself,bsup,cEnglishname) 
-                    values(@ccusname,@xmbm,@cinvcode,@cinvaddcode,@cinvname,@cinvstd,@cqty1,@cmemo1,@czt,@cmaker,@ddate,getdate(),@bimportant,@burgent,@zdxjr,@baojia1,@cpersoncode,@cdefine1,@bself,@bsup,@cEnglishname) select @@identity ";
+                           string sql = @" Insert Into zdy_lk_xunjia(ccusname,xmbm,cinvcode,cinvaddcode,cinvname,cinvstd,cqty1,cmemo1,czt,cmaker,ddate,dmaketime,zdxjr,baojia1,cpersoncode,cEnglishname) 
+                    values(@ccusname,@xmbm,@cinvcode,@cinvaddcode,@cinvname,@cinvstd,@cqty1,@cmemo1,@czt,@cmaker,@ddate,getdate(),@zdxjr,@baojia1,@cpersoncode,@cEnglishname) select @@identity ";
                            object obj = DbHelper.GetSingle(sql, new SqlParameter[]{ 
                              new SqlParameter("@ccusname", dataGridView1.Rows[i].Cells["ccusname"].Value), 
                              new SqlParameter("@xmbm", dataGridView1.Rows[i].Cells["xmbm"].Value),
@@ -541,14 +562,9 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                              new SqlParameter("@czt", dataGridView1.Rows[i].Cells["czt"].Value),
                              new SqlParameter("@cmaker",canshu.userName),
                              new SqlParameter("@ddate",dataGridView1.Rows[i].Cells["ddate"].Value),
-                             new SqlParameter("@bimportant",dataGridView1.Rows[i].Cells["bimportant"].Value),
-                             new SqlParameter("@burgent",dataGridView1.Rows[i].Cells["burgent"].Value),
                              new SqlParameter("@zdxjr",dataGridView1.Rows[i].Cells["zdxjr"].Value),
                               new SqlParameter("@baojia1",dataGridView1.Rows[i].Cells["baojia1"].Value),
                                 new SqlParameter("@cpersoncode",dataGridView1.Rows[i].Cells["cpersoncode"].Value),
-                                  new SqlParameter("@cdefine1",dataGridView1.Rows[i].Cells["cdefine1"].Value),
-                                  new SqlParameter("@bself",DbHelper.ToDbValue(dataGridView1.Rows[i].Cells["bself"].Value)),
-                                  new SqlParameter("@bsup",DbHelper.ToDbValue(dataGridView1.Rows[i].Cells["bsup"].Value)),
                                   new SqlParameter("@cEnglishname",DbHelper.ToDbValue(dataGridView1.Rows[i].Cells["cEnglishname"].Value))
                             });
                            //数据表赋值
@@ -569,9 +585,9 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                            else
                            {
                                string sql = @" update zdy_lk_xunjia
-                        set ccusname=@ccusname,xmbm=@xmbm,cinvcode=@cinvcode,cinvname=@cinvname,cinvstd=@cinvstd,bimportant =@bimportant,burgent = @burgent ,zdxjr = @zdxjr
+                        set ccusname=@ccusname,xmbm=@xmbm,cinvcode=@cinvcode,cinvname=@cinvname,cinvstd=@cinvstd,zdxjr = @zdxjr
                         ,cqty1=@cqty1,cmemo1=@cmemo1,czt=@czt,cmaker=@cmaker,ddate=@ddate,dmodifytime=getdate(),baojia1= @baojia1,
-                            cpersoncode = @cpersoncode,cdefine1 = @cdefine1,cinvaddcode = @cinvaddcode,cEnglishname  = @cEnglishname
+                            cpersoncode = @cpersoncode,cinvaddcode = @cinvaddcode,cEnglishname  = @cEnglishname
                          where id = @id  ";
                                object obj = DbHelper.GetSingle(sql, new SqlParameter[]{ 
                              new SqlParameter("@ccusname", dataGridView1.Rows[i].Cells["ccusname"].Value), 
@@ -586,12 +602,9 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                              new SqlParameter("@cmaker",canshu.userName),
                              new SqlParameter("@ddate",dataGridView1.Rows[i].Cells["ddate"].Value),
                               new SqlParameter("@id",dataGridView1.Rows[i].Cells["id"].Value),
-                               new SqlParameter("@bimportant",dataGridView1.Rows[i].Cells["bimportant"].Value),
-                             new SqlParameter("@burgent",dataGridView1.Rows[i].Cells["burgent"].Value),
                              new SqlParameter("@zdxjr",dataGridView1.Rows[i].Cells["zdxjr"].Value),
                               new SqlParameter("@baojia1",dataGridView1.Rows[i].Cells["baojia1"].Value),
                                  new SqlParameter("@cpersoncode",dataGridView1.Rows[i].Cells["cpersoncode"].Value),
-                                   new SqlParameter("@cdefine1",dataGridView1.Rows[i].Cells["cdefine1"].Value),
                                    new SqlParameter("@cEnglishname",dataGridView1.Rows[i].Cells["cEnglishname"].Value),
                             });
                               
@@ -615,6 +628,7 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
        }
        #endregion
 
+       #region Excel导入
        public void ExcelIn()
        {
            try
@@ -636,7 +650,7 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
                            DataRow dr = dtXunjia.NewRow();
                            dr["ddate"] =DateTime.Now.ToString("yyyy-MM-dd");
                            dr["ccusname"] = DbHelper.GetDbString(dtImport.Rows[i]["客户"]);
-                           dr["cdefine1"] = DbHelper.GetDbString(dtImport.Rows[i]["销售公司"]);
+                           //dr["cdefine1"] = DbHelper.GetDbString(dtImport.Rows[i]["销售公司"]);
                            dr["xmbm"] = DbHelper.GetDbString(dtImport.Rows[i]["项目"]);
                            dr["cinvaddcode"] = DbHelper.GetDbString(dtImport.Rows[i]["CAS"]);
                            dr["cinvcode"] = DbHelper.GetDbString(dtImport.Rows[i]["存货编码"]);
@@ -665,7 +679,7 @@ GROUP BY b.cInvAddCode", DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].V
 
            }
        }
-
+       #endregion
 
        #region 报价保存
        public void Save2()
@@ -1025,6 +1039,7 @@ cmemo1 = @cmemo1
              conditionSql += string.Format(" and  byanfa = 1");
            }
 
+           //lx=1，代表是销售提出的询价
            //StringBuilder strb = new StringBuilder(@"SELECT 0 as xz,* from zdy_lk_xunjia where cmaker = '"+canshu.userName+"'");
            StringBuilder strb = new StringBuilder(@"SELECT 0 as xz,* from zdy_lk_xunjia where isnull(lx,1)=1 ");
            strb.Append(conditionSql);
@@ -1034,82 +1049,86 @@ cmemo1 = @cmemo1
 
            //dtXunjia.Columns.Add("bkucun", typeof(Boolean));
            dataGridView1.DataSource = dtXunjia;
+           if (dtXunjia.Rows.Count > 0)
+           {
+               GetMx(0);
+           }
+           else
+           {
+               dataGridView2.DataSource = null;
+               dataGridView3.DataSource = null;
+               gridControl1.DataSource = null;
+           }
        }
        #endregion
 
        #region 输入条件 参照
        private void button1_Click(object sender, EventArgs e)
        {
+           
+           #region  系统参照，取消
+           //try
+           //{
+
+           //    U8RefService.IServiceClass obj = new U8RefService.IServiceClass();
+           //    obj.RefID = "Inventory_AA";
+           //    obj.Mode = U8RefService.RefModes.modeRefing;
+           //    //obj.FilterSQL = " bbomsub =1";
+           //    obj.FillText =txtcinvcode.Text;
+           //    obj.Web = false;
+           //    obj.MetaXML = "<Ref><RefSet   bMultiSel='0'  /></Ref>";
+           //    obj.RememberLastRst = false;
+           //    ADODB.Recordset retRstGrid = null, retRstClass = null;
+           //    string sErrMsg = "";
+           //    obj.GetPortalHwnd((int)this.Handle);
+
+           //    Object objLogin = canshu.u8Login;
+           //    if (obj.ShowRefSecond(ref objLogin, ref retRstClass, ref retRstGrid, ref sErrMsg) == false)
+           //    {
+           //        MessageBox.Show(sErrMsg);
+           //    }
+           //    else
+           //    {
+           //        if (retRstGrid != null)
+           //        {
+
+           //            this.txtcinvcode.Text = DbHelper.GetDbString(retRstGrid.Fields["cinvaddcode"].Value);
+           //        }
+           //    }
+           //}
+           //catch (Exception ex)
+           //{
+           //    MessageBox.Show("参照失败，原因：" + ex.Message);
+           //}
+           #endregion
+       }
+
+       private void txtcinvcode_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+       {
            try
            {
+               string sql = @" SELECT cinvaddcode CAS,cinvcode 存货编码,cinvname 存货名称 FROM inventory a WHERE isnull(dedate,'')='' and cinvcode like 'LK%' ";
+               //sql += " order by cdepcode";
+               DataTable dtInv = DbHelper.Execute(sql).Tables[0];
 
-               U8RefService.IServiceClass obj = new U8RefService.IServiceClass();
-               obj.RefID = "Inventory_AA";
-               obj.Mode = U8RefService.RefModes.modeRefing;
-               //obj.FilterSQL = " bbomsub =1";
-               obj.FillText =txtcinvcode.Text;
-               obj.Web = false;
-               obj.MetaXML = "<Ref><RefSet   bMultiSel='0'  /></Ref>";
-               obj.RememberLastRst = false;
-               ADODB.Recordset retRstGrid = null, retRstClass = null;
-               string sErrMsg = "";
-               obj.GetPortalHwnd((int)this.Handle);
-
-               Object objLogin = canshu.u8Login;
-               if (obj.ShowRefSecond(ref objLogin, ref retRstClass, ref retRstGrid, ref sErrMsg) == false)
+               frm_canzhao frm = new frm_canzhao(dtInv, txtcinvcode.Text, "存货档案");
+               frm.ShowDialog();
+               if (frm.drxz != null)
                {
-                   MessageBox.Show(sErrMsg);
-               }
-               else
-               {
-                   if (retRstGrid != null)
-                   {
+                   txtcinvcode.Text = DbHelper.GetDbString(frm.drxz["CAS"]);
 
-                       this.txtcinvcode.Text = DbHelper.GetDbString(retRstGrid.Fields["cinvcode"].Value);
-                   }
                }
            }
-           catch (Exception ex)
+           catch (Exception EX)
            {
-               MessageBox.Show("参照失败，原因：" + ex.Message);
+               MessageBox.Show(EX.Message);
+               return;
            }
        }
 
        private void button2_Click(object sender, EventArgs e)
        {
-           try
-           {
-
-               U8RefService.IServiceClass obj = new U8RefService.IServiceClass();
-               obj.RefID = "hr_hi_person_AA";
-               obj.Mode = U8RefService.RefModes.modeRefing;
-               //obj.FilterSQL = " cdepcode in ('01','04','07')  and rpersontype =10";
-               obj.FillText = txtywy.Text;
-               obj.Web = false;
-               obj.MetaXML = "<Ref><RefSet   bMultiSel='0'  /></Ref>";
-               obj.RememberLastRst = false;
-               ADODB.Recordset retRstGrid = null, retRstClass = null;
-               string sErrMsg = "";
-               obj.GetPortalHwnd((int)this.Handle);
-
-               Object objLogin = canshu.u8Login;
-               if (obj.ShowRefSecond(ref objLogin, ref retRstClass, ref retRstGrid, ref sErrMsg) == false)
-               {
-                   MessageBox.Show(sErrMsg);
-               }
-               else
-               {
-                   if (retRstGrid != null)
-                   {
-
-                       this.txtywy.Text = DbHelper.GetDbString(retRstGrid.Fields["cpsn_name"].Value);
-                   }
-               }
-           }
-           catch (Exception ex)
-           {
-               MessageBox.Show("参照失败，原因：" + ex.Message);
-           }
+           
        }
 
 
@@ -1151,12 +1170,10 @@ cmemo1 = @cmemo1
        }
        #endregion
 
-       #region 换行自动保存
+       #region 换行自动保存，已取消
        private void dataGridView1_RowLeave(object sender, DataGridViewCellEventArgs e)
        {
 
-
-     
 //           try
 //           {
 //               //新增行，自动保存
@@ -1207,55 +1224,80 @@ cmemo1 = @cmemo1
 //           }
        }
        #endregion
+  
 
-       //private void dataGridView1_Leave(object sender, EventArgs e)
+       #region 点击显示明细，增加库存和历史询价
+       //private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
        //{
-       //    this.Validate();
-       //    this.Update();
+       //    int iRow = e.RowIndex;
+       //    //GetMx(iRow);
        //}
 
-       //private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-       //{
-
-       //}
-
-       #region 点击显示明细
-       private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+       private void GetMx(int iRow)
        {
-           if (e.RowIndex != -1)
+           if (iRow != -1)
            {
-               string id = DbHelper.GetDbString(dataGridView1.Rows[e.RowIndex].Cells["id"].Value);
-               dataGridView2.DataSource = DbHelper.ExecuteTable(@"select ddate,gys,xunjia1,xunjia2,xunjia3,bz1,bz2,bz3,
-               bYanfaQuery,
-cCost,
-cattch,
-cattch_fileid   from zdy_lk_xunjias where id ='" + id.ToString() + "'");
-           
-           
+               string id = DbHelper.GetDbString(dataGridView1.Rows[iRow].Cells["id"].Value);
+               string cCAS = DbHelper.GetDbString(dataGridView1.Rows[iRow].Cells["cinvaddcode"].Value);
+               string sql = "";
+               //采购询价
+               dtXunjias = DbHelper.ExecuteTable(@"select ddate,gys,xunjia1,xunjia2,xunjia3,bz1,bz2,bz3,
+               bYanfaQuery,cCost,cattch,cattch_fileid   from zdy_lk_xunjias where id ='" + id + "'");
+               dataGridView2.DataSource = dtXunjias;
+               //现存量
+               if (!string.IsNullOrEmpty(cCAS))
+               {
+                   sql = string.Format(@"SELECT c.cwhname,  b.invaddcode,  b.InvCode,b.InvName ,b.InvStd,b.ComUnitName,a.cBatch,convert(real, a.iQuantity) as  iQuantity  FROM warehouse c,
+dbo.CurrentStock  a,dbo.v_bas_inventory b WHERE a.cInvCode = b.InvCode  and a.cwhcode = c.cwhcode
+AND a.iQuantity>0  and b.invaddcode like '%{0}%'  ", cCAS);
+                   DataTable dtlk = DbHelper.ExecuteTable(sql);
+
+                   //是否包含江西库存
+                   if (canshu.bCxJiangXikc == "1")
+                   {
+                       //江西存量
+                       sql = string.Format(@"SELECT c.cwhname,  b.invaddcode,  b.InvCode,b.InvName ,b.InvStd,b.ComUnitName,a.cBatch,convert(real, a.iQuantity) as  iQuantity  FROM warehouse c,
+dbo.CurrentStock  a,dbo.v_bas_inventory b WHERE a.cInvCode = b.InvCode  and a.cwhcode = c.cwhcode
+AND a.iQuantity>0  and b.invaddcode like '%{0}%'  ", cCAS);
+                       DataTable dtyt = DbHelper2.Execute(sql, canshu.conStr2).Tables[0];
+
+                       dtKuCun = dtlk.Copy();
+                       //添加DataTable2的数据
+                       foreach (DataRow dr in dtyt.Rows)
+                       {
+                           dtKuCun.ImportRow(dr);
+                       }
+                       gridControl1.DataSource = dtKuCun;
+                   }
+                   else
+                   {
+                       dtKuCun = dtlk.Copy();
+                       gridControl1.DataSource = dtKuCun;
+                   }
+
+                   //历史询价，查询最近3个月的历史询价
+                   sql = string.Format(@" select a.ddate,a.cmaker,ccusname,a.fpxjrxm,a.cinvcode,cinvaddcode,a.cinvstd,a.cinvname,a.cqty1,b.xunjia1,b.xunjia2,b.xunjia3,b.bz1,b.bz2,b.bz3  from zdy_lk_xunjia a,zdy_lk_xunjias b 
+                where a.id = b.id and A.ddate>DATEADD(M,-3,GETDATE())  and (cinvcode = '{0}' or cinvaddcode = '{0}')  ", cCAS);
+                   dtLishiXunjia = DbHelper.ExecuteTable(sql);
+                   dataGridView3.DataSource = dtLishiXunjia;
+               }
+               else
+               {
+                     gridControl1.DataSource= null;
+                     dataGridView3.DataSource = null;
+
+               }
            }
        }
        #endregion
 
 
-       private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-       {
-           //if (dataGridView1.Columns[e.ColumnIndex].Name == "cinvcode")
-           //{
-           //    string cInvcode = e.FormattedValue.ToString();
-
-             
-           //     string sRe =   pdChongfu(cInvcode);
-           //     if (sRe=="error")
-           //         e.Cancel = true;
-
-               
-           //}
-       }
-#region 判断重复询价
+    
+#region 判断重复询价，取消，没有用
                 private string  pdChongfu(string cInvcode)
             {
                     
-    string sqlpd = "select count(1) from zdy_lk_xunjia where cinvcode = '" + cInvcode + "' and datediff(day,ddate,getdate())<3";
+    string sqlpd = "select top 1 id from zdy_lk_xunjia where cinvcode = '" + cInvcode + "' and datediff(day,ddate,getdate())<3";
                        object objpd = DbHelper.ExecuteScalar(sqlpd);
                        if (Convert.ToInt32(objpd) > 0)
                        {
@@ -1311,67 +1353,66 @@ cattch_fileid   from zdy_lk_xunjias where id ='" + id.ToString() + "'");
                 #region 单元格离开,存货档案及客户单元格离开
                 private void dataGridView1_CellLeave(object sender, DataGridViewCellEventArgs e)
                 {
-                    try
-                    {
-                        dataGridView1.EndEdit();
-                        string sColname2 = this.dataGridView1.Columns[e.ColumnIndex].Name.ToString();
-                        if (sColname2 == "cinvaddcode")
-                        {
-                            string cInvocode = DbHelper.GetDbString(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+//                    try
+//                    {
+//                        dataGridView1.EndEdit();
+//                        string sColname2 = this.dataGridView1.Columns[e.ColumnIndex].Name.ToString();
+//                        if (sColname2 == "cinvaddcode")
+//                        {
+//                            string cInvocode = DbHelper.GetDbString(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
 
-                            if (!string.IsNullOrEmpty(cInvocode))
-                            {
-                            string sql = @"
-select a.cinvcode, a.cinvname,a.cinvstd,b.bSelf,b.bSup,a.cEnglishname from inventory a 
-LEFT JOIN  zdy_lk_Inventory_Sup b ON a.cInvAddCode = b.cInvaddcode
- where dedate is null and  a.cinvaddcode  ='" + cInvocode + "'";
-                           DataTable dt = DbHelper.ExecuteTable(sql);
-                           if (dt.Rows.Count > 0)
-                           {
-                               dataGridView1.Rows[e.RowIndex].Cells["cinvcode"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvcode"]);
-                               dataGridView1.Rows[e.RowIndex].Cells["cinvname"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvname"]);
-                               dataGridView1.Rows[e.RowIndex].Cells["cinvstd"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvstd"]);
-                               dataGridView1.Rows[e.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
+//                            if (!string.IsNullOrEmpty(cInvocode))
+//                            {
+//                            string sql = @"
+//select a.cinvcode, a.cinvname,a.cinvstd,b.bSelf,b.bSup,a.cEnglishname from inventory a 
+//LEFT JOIN  zdy_lk_Inventory_Sup b ON a.cInvAddCode = b.cInvaddcode
+// where dedate is null and  a.cinvaddcode  ='" + cInvocode + "'";
+//                           DataTable dt = DbHelper.ExecuteTable(sql);
+//                           if (dt.Rows.Count > 0)
+//                           {
+//                               dataGridView1.Rows[e.RowIndex].Cells["cinvcode"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvcode"]);
+//                               dataGridView1.Rows[e.RowIndex].Cells["cinvname"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvname"]);
+//                               dataGridView1.Rows[e.RowIndex].Cells["cinvstd"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvstd"]);
+//                               dataGridView1.Rows[e.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
 
-                               dataGridView1.Rows[e.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSelf"];
-                               dataGridView1.Rows[e.RowIndex].Cells["bSup"].Value = dt.Rows[0]["bSup"];
+//                               dataGridView1.Rows[e.RowIndex].Cells["bself"].Value = dt.Rows[0]["bSelf"];
+//                               dataGridView1.Rows[e.RowIndex].Cells["bSup"].Value = dt.Rows[0]["bSup"];
 
-                               sql = string.Format(@"
-SELECT SUM(a.iQuantity) sl  FROM dbo.CurrentStock  a,dbo.Inventory b WHERE a.cInvCode = b.cInvCode and b.cinvaddcode = '{0}'
-GROUP BY b.cInvAddCode", cInvocode);
-                               if (DbHelper.GetDbInt(DbHelper.ExecuteScalar(sql)) > 0)
-                               {
-                                   dataGridView1.Rows[e.RowIndex].Cells["bkucun"].Value = "True";
+//                               sql = string.Format(@"
+//SELECT SUM(a.iQuantity) sl  FROM dbo.CurrentStock  a,dbo.Inventory b WHERE a.cInvCode = b.cInvCode and b.cinvaddcode = '{0}'
+//GROUP BY b.cInvAddCode", cInvocode);
+//                               if (DbHelper.GetDbInt(DbHelper.ExecuteScalar(sql)) > 0)
+//                               {
+//                                   dataGridView1.Rows[e.RowIndex].Cells["bkucun"].Value = "True";
 
-                               }
-                               else
-                               {
-                                   dataGridView1.Rows[e.RowIndex].Cells["bkucun"].Value = "False";
+//                               }
+//                               else
+//                               {
+//                                   dataGridView1.Rows[e.RowIndex].Cells["bkucun"].Value = "False";
 
-                               }
-
-
-
-                           }
-
-
-                            }
+//                               }
 
 
 
+//                           }
 
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("单元格离开错误:"+ex.Message);
-                        return;
-                    }
+
+//                            }
+
+
+
+
+//                        }
+//                    }
+//                    catch (Exception ex)
+//                    {
+//                        MessageBox.Show("单元格离开错误:"+ex.Message);
+//                        return;
+//                    }
                                             
 
                 }
                 #endregion
-
 
 
 
@@ -1506,7 +1547,7 @@ GROUP BY b.cInvAddCode", cInvocode);
 #endregion
 
 
-        #region 查询库存
+        #region 查询库存 取消，合并到getMx
                 public void QueryKC()
                 {
 
@@ -1533,7 +1574,7 @@ GROUP BY b.cInvAddCode", cInvocode);
 
         #endregion
 
-                #region 下载附件
+                #region 下载附件,取消
                 /// <summary>
                 /// 下载附件
                 /// </summary>
@@ -1619,7 +1660,102 @@ GROUP BY b.cInvAddCode", cInvocode);
                     this.dataGridView1.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
                 }
 
-            
+                #region 制单人参照
+                private void txtywy_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+                {
+                    try
+                    {
+                        string sql = @" select cpersoncode 编码,cpersonname 姓名 from zdy_lk_v_xunjia_xsperson ";
+                        //sql += " order by cdepcode";
+                        DataTable dtInv = DbHelper.Execute(sql).Tables[0];
+
+                        frm_canzhao frm = new frm_canzhao(dtInv, txtcinvcode.Text, "销售人员档案");
+                        frm.ShowDialog();
+                        if (frm.drxz != null)
+                        {
+                            txtywy.Text = DbHelper.GetDbString(frm.drxz["姓名"]);
+
+                        }
+                    }
+                    catch (Exception EX)
+                    {
+                        MessageBox.Show(EX.Message);
+                        return;
+                    }
+
+                }
+                #endregion
+
+                #region 业务员参照
+                private void txtywy2_ButtonClick(object sender, DevExpress.XtraEditors.Controls.ButtonPressedEventArgs e)
+                {
+                    try
+                    {
+                        string sql = @" select cpersoncode 编码,cpersonname 姓名 from zdy_lk_v_xunjia_xsperson ";
+                        //sql += " order by cdepcode";
+                        DataTable dtInv = DbHelper.Execute(sql).Tables[0];
+
+                        frm_canzhao frm = new frm_canzhao(dtInv, txtcinvcode.Text, "销售人员档案");
+                        frm.ShowDialog();
+                        if (frm.drxz != null)
+                        {
+                            txtywy2.Text = DbHelper.GetDbString(frm.drxz["姓名"]);
+
+                        }
+                    }
+                    catch (Exception EX)
+                    {
+                        MessageBox.Show(EX.Message);
+                        return;
+                    }
+                }
+                #endregion
+
+
+                private void dataGridView1_RowEnter(object sender, DataGridViewCellEventArgs e)
+                {
+                    int iRow = e.RowIndex;
+                    GetMx(iRow);
+                }
+
+                private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+                {
+                    int iRow = e.RowIndex;
+                    //CAS号修改后，表体内容更改
+                    if (dataGridView1.Columns[e.ColumnIndex].Name == "cinvaddcode")
+                    {
+                        string cCAS= DbHelper.GetDbString(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+
+                       
+                        string sql = @"select a.cinvcode, a.cinvname,a.cinvstd,a.cEnglishname from inventory a 
+ where dedate is null and  a.cinvaddcode  ='" + cCAS + "'";
+                             DataTable dt = DbHelper.ExecuteTable(sql);
+                             if (dt.Rows.Count > 0)
+                             {
+                                 dataGridView1.Rows[e.RowIndex].Cells["cinvcode"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvcode"]);
+                                 dataGridView1.Rows[e.RowIndex].Cells["cinvname"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvname"]);
+                                 dataGridView1.Rows[e.RowIndex].Cells["cinvstd"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvstd"]);
+                                 dataGridView1.Rows[e.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
+
+                             }
+                        else
+                        {
+                            sql =string.Format( @"select  cinvname, cEnglishname from zdy_lk_inventory a  where  cas  ='{0}'",cCAS);
+                            dt = DbHelper.ExecuteTable(sql);
+                            if (dt.Rows.Count > 0)
+                            {
+                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cinvname"].Value = DbHelper.GetDbString(dt.Rows[0]["cinvname"]);
+                                dataGridView1.Rows[dataGridView1.CurrentCell.RowIndex].Cells["cEnglishname"].Value = DbHelper.GetDbString(dt.Rows[0]["cEnglishname"]);
+
+                            }
+                        }
+
+
+                        GetMx(iRow);
+                    }
+                }
+
+
 
 
     }

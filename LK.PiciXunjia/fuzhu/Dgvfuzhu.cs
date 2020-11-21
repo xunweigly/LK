@@ -44,12 +44,17 @@ namespace fuzhu
 
                 foreach (DataRow row in DTname.Rows)
                 {
-                    dgvMain.Columns[row["ColName"].ToString().Trim()].HeaderText = row["ColHeaderText"].ToString().Trim();
-                    dgvMain.Columns[row["ColName"].ToString().Trim()].Width = int.Parse(row["ColWidth"].ToString().Trim());
-                    dgvMain.Columns[row["ColName"].ToString().Trim()].Visible = Boolean.Parse(row["ColVisble"].ToString().Trim());
-                    dgvMain.Columns[row["ColName"].ToString().Trim()].DisplayIndex = int.Parse(row["ColId"].ToString().Trim());
-                    //dgvMain.Columns[row["name"].ToString()].DefaultCellStyle.Alignment = (DataGridViewContentAlignment)row["DefaultCellStyle"];
-                    //dgvMain.Columns[row["ColumnType"].ToString()].DataPropertyName = row["ColumnType"].ToString();              
+                    //判断是否有这个列
+                    if (dgvMain.Columns.Contains(row["ColName"].ToString()))
+                    {
+
+                        dgvMain.Columns[row["ColName"].ToString().Trim()].HeaderText = row["ColHeaderText"].ToString().Trim();
+                        dgvMain.Columns[row["ColName"].ToString().Trim()].Width = int.Parse(row["ColWidth"].ToString().Trim());
+                        dgvMain.Columns[row["ColName"].ToString().Trim()].Visible = Boolean.Parse(row["ColVisble"].ToString().Trim());
+                        dgvMain.Columns[row["ColName"].ToString().Trim()].DisplayIndex = int.Parse(row["ColId"].ToString().Trim());
+                        //dgvMain.Columns[row["name"].ToString()].DefaultCellStyle.Alignment = (DataGridViewContentAlignment)row["DefaultCellStyle"];
+                        //dgvMain.Columns[row["ColumnType"].ToString()].DataPropertyName = row["ColumnType"].ToString();   
+                    }
                 }
             }
             catch (Exception ex)

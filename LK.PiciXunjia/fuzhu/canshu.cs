@@ -18,7 +18,8 @@ namespace LKU8.shoukuan
 
         public static string cMenuname2 { get; set; }
         public static string serverName { get; set; }
-
+        public static string conStr2 { get; set; }
+        public static string bCxJiangXikc { get; set; }
 
 
 

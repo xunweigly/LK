@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 //1.5 增加离开单元格显示存货名称，设置历史询价显示最近10笔
 //1.7 增加研发询价功能
 //1.8.2 20190722 取消报价2，报价3。取消数量2，数量3
-[assembly: AssemblyVersion("1.9.1.0")]
-[assembly: AssemblyFileVersion("1.9.1.0")]
+[assembly: AssemblyVersion("1.9.2.0")]
+[assembly: AssemblyFileVersion("1.9.2.0")]

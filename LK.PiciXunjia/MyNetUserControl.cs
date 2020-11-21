@@ -110,6 +110,33 @@ namespace LKU8.shoukuan
             ac.RowSpan = 3;
             aclist[5] = ac;
 
+           
+
+            ac = new NetAction("xunjia2", nsd);
+            //aclist = new NetAction[1];
+            ac.Text = "研发询价提交";
+            ac.Tag = usercontrol;
+            ac.Image = Properties.Resources.write_off;
+            ac.ActionType = NetAction.NetActionType.Edit;
+            ac.DisplayStyle = 1;
+            ac.Style = 1;
+            ac.SetGroup = "研发询价";
+            ac.SetGroupRow = 1;
+            ac.RowSpan = 3;
+            aclist[6] = ac;
+
+            ac = new NetAction("quxiao", nsd);
+            //aclist = new NetAction[1];
+            ac.Text = "取消研发询价";
+            ac.Tag = usercontrol;
+            ac.Image = Properties.Resources.Unapprove;
+            ac.ActionType = NetAction.NetActionType.Edit;
+            ac.DisplayStyle = 1;
+            ac.Style = 1;
+            ac.SetGroup = "研发询价";
+            ac.SetGroupRow = 1;
+            ac.RowSpan = 3;
+            aclist[7] = ac;
 
             ac = new NetAction("liancha", nsd);
             //aclist = new NetAction[1];
@@ -122,7 +149,8 @@ namespace LKU8.shoukuan
             ac.SetGroup = "联查询价单";
             ac.SetGroupRow = 1;
             ac.RowSpan = 3;
-            aclist[6] = ac;
+            ac.IsVisible = false;
+            aclist[8] = ac;
             //return aclist;
 
 
@@ -131,43 +159,13 @@ namespace LKU8.shoukuan
             //aclist = new NetAction[1];
             ac.Text = "查询";
             ac.Tag = usercontrol;
-            ac.Image = Properties.Resources.filter;
+            ac.Image = Properties.Resources.query;
             ac.ActionType = NetAction.NetActionType.Edit;
             ac.DisplayStyle = 1;
             ac.Style = 1;
             ac.SetGroup = "查询";
             ac.SetGroupRow = 1;
             ac.RowSpan = 3;
-            aclist[7] = ac;
-
-
-
-            
-
-            ac = new NetAction("savebuju", nsd);
-            //aclist = new NetAction[1];
-            ac.Text = "保存布局";
-            ac.Tag = usercontrol;
-            ac.Image = Properties.Resources.import;
-            ac.ActionType = NetAction.NetActionType.Edit;
-            ac.DisplayStyle = 1;
-            ac.Style = 1;
-            ac.SetGroup = "保存布局";
-            ac.SetGroupRow = 1;
-            ac.RowSpan = 1;
-            aclist[8] = ac;
-
-            ac = new NetAction("delbuju", nsd);
-            //aclist = new NetAction[1];
-            ac.Text = "删除布局";
-            ac.Tag = usercontrol;
-            ac.Image = Properties.Resources.import;
-            ac.ActionType = NetAction.NetActionType.Edit;
-            ac.DisplayStyle = 1;
-            ac.Style = 1;
-            ac.SetGroup = "保存布局";
-            ac.SetGroupRow = 1;
-            ac.RowSpan = 1;
             aclist[9] = ac;
 
             ac = new NetAction("save2", nsd);
@@ -184,31 +182,7 @@ namespace LKU8.shoukuan
             aclist[10] = ac;
 
 
-            ac = new NetAction("xunjia2", nsd);
-            //aclist = new NetAction[1];
-            ac.Text = "研发询价";
-            ac.Tag = usercontrol;
-            ac.Image = Properties.Resources.query;
-            ac.ActionType = NetAction.NetActionType.Edit;
-            ac.DisplayStyle = 1;
-            ac.Style = 1;
-            ac.SetGroup = "研发询价";
-            ac.SetGroupRow = 1;
-            ac.RowSpan = 3;
-            aclist[11] = ac;
-
-            ac = new NetAction("quxiao", nsd);
-            //aclist = new NetAction[1];
-            ac.Text = "取消研发询价";
-            ac.Tag = usercontrol;
-            ac.Image = Properties.Resources.Select_all;
-            ac.ActionType = NetAction.NetActionType.Edit;
-            ac.DisplayStyle = 1;
-            ac.Style = 1;
-            ac.SetGroup = "研发询价";
-            ac.SetGroupRow = 1;
-            ac.RowSpan = 3;
-            aclist[12] = ac;
+           
 
 
             ac = new NetAction("querykc", nsd);
@@ -222,7 +196,8 @@ namespace LKU8.shoukuan
             ac.SetGroup = "查询";
             ac.SetGroupRow = 1;
             ac.RowSpan = 3;
-            aclist[13] = ac;
+            ac.IsVisible = false;
+            aclist[11] = ac;
 
             ac = new NetAction("xiazai", nsd);
             //aclist = new NetAction[1];
@@ -234,17 +209,9 @@ namespace LKU8.shoukuan
             ac.Style = 1;
             ac.SetGroup = "查询";
             ac.SetGroupRow = 1;
-            //if (canshu.userName.Contains("陆茜") || canshu.userName.Contains("匡逸") || canshu.userName.Contains("demo"))
-            //{
-            //    ac.IsVisible = true;
-            //}
-            //else
-            //{
-
-                ac.IsVisible = false;
-            //}
+            ac.IsVisible = false;
             ac.RowSpan = 3;
-            aclist[14] = ac;
+            aclist[12] = ac;
 
 
             ac = new NetAction("daoru", nsd);
@@ -259,7 +226,35 @@ namespace LKU8.shoukuan
             ac.SetGroupRow = 1;
             //ac.IsVisible = false;
             ac.RowSpan = 3;
+            aclist[13] = ac;
+
+            ac = new NetAction("savebuju", nsd);
+            //aclist = new NetAction[1];
+            ac.Text = "保存布局";
+            ac.Tag = usercontrol;
+            ac.Image = Properties.Resources.import;
+            ac.ActionType = NetAction.NetActionType.Edit;
+            ac.DisplayStyle = 1;
+            ac.Style = 1;
+            ac.SetGroup = "保存布局";
+            ac.SetGroupRow = 1;
+            ac.RowSpan = 1;
+            aclist[14] = ac;
+
+            ac = new NetAction("delbuju", nsd);
+            //aclist = new NetAction[1];
+            ac.Text = "删除布局";
+            ac.Tag = usercontrol;
+            ac.Image = Properties.Resources.import;
+            ac.ActionType = NetAction.NetActionType.Edit;
+            ac.DisplayStyle = 1;
+            ac.Style = 1;
+            ac.SetGroup = "保存布局";
+            ac.SetGroupRow = 1;
+            ac.RowSpan = 1;
             aclist[15] = ac;
+
+
             return aclist;
             ////return null;
         }

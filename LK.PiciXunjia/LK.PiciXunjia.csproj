@@ -12,6 +12,7 @@
     <AssemblyName>LK.PiciXunjia</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -133,6 +134,7 @@
     </Compile>
     <Compile Include="fuzhu\canshu.cs" />
     <Compile Include="fuzhu\CommonHelper.cs" />
+    <Compile Include="fuzhu\DbHelper2.cs" />
     <Compile Include="fuzhu\ExcelHelper.cs" />
     <Compile Include="fuzhu\ExtensionMethods.cs" />
     <Compile Include="fuzhu\ClsDealField.cs" />
@@ -155,7 +157,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="shoukuanapi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserControl1.cs">
       <SubType>UserControl</SubType>
@@ -216,9 +217,6 @@
     <None Include="Resources\cost.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Confirm.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\filter.png" />
   </ItemGroup>
   <ItemGroup>
@@ -235,6 +233,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\transfer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Confirm.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Unapprove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\write off.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
